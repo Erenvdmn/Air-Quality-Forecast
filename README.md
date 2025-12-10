@@ -1,61 +1,123 @@
-# HKE Air Quality Analysis Project
+# 🌍 AirQualityAI: AI-Powered Air Quality Forecasting System
 
-Collects weekly air quality and weather data for selected Turkish cities, saves it to CSV, generates visualizations, and trains prediction models.
+![Python](https://img.shields.io/badge/Python-3.9%2B-blue?style=for-the-badge&logo=python&logoColor=white)
+![Streamlit](https://img.shields.io/badge/Streamlit-Dashboard-FF4B4B?style=for-the-badge&logo=streamlit&logoColor=white)
+![Scikit-Learn](https://img.shields.io/badge/scikit--learn-Machine%20Learning-F7931E?style=for-the-badge&logo=scikit-learn&logoColor=white)
+![Status](https://img.shields.io/badge/Status-Completed-success?style=for-the-badge)
 
-## Project files
-- **haftalik_veri_topla.py** — collects air quality & weather data from OpenWeatherMap API and appends to `haftalik_hava_kalitesi.csv`
-- **grafik_analiz.py** — generates time-series and scatter plots, saves to `grafikler/` folder
-- **tahmin_modeli.py** — trains/evaluates PM2.5 prediction models (Linear Regression, Random Forest), saves to `models/`
-- **rf_actual_vs_pred.png** — shows the result of `tahmin_modeli.py` with graphs
-- **haftalik_hava_kalitesi.csv** — collected raw data
-- **grafikler/** — output PNG files
-- **models/** — saved trained models and feature importance CSV
-- **.env** — (not committed) store API key: `API_KEY=your_openweathermap_api_key`
+## 📖 Overview
+**AirQualityAI** is a machine learning project designed to forecast the **Air Quality Index (AQI)** for major Turkish cities (Malatya, Istanbul, Ankara, Izmir, Bursa).
 
-## Requirements
-- Python 3.8+
-- Packages: pandas, matplotlib, seaborn, requests, python-dotenv, scikit-learn, joblib, numpy
+Unlike traditional weather apps that only show current conditions, this system analyzes **historical atmospheric data** (2 years) and **meteorological factors** (Wind, Temperature, Rain) to predict tomorrow's air quality risk using **Gradient Boosting** algorithms.
 
-Install (Windows PowerShell):
-```powershell
-python -m venv .venv
-.venv\Scripts\Activate.ps1
-python -m pip install pandas matplotlib seaborn requests python-dotenv scikit-learn joblib numpy
-```
+The project addresses real-world data challenges such as sensor failures (NaN values) by implementing robust data imputation techniques (Linear Interpolation & Backfill).
 
-## Setup
-1. Create `.env` file in project root with your OpenWeatherMap API key:
-   ```
-   API_KEY=your_api_key_here
-   ```
-2. Activate virtual environment and install dependencies.
+---
 
-## Usage
-**Collect data:**
-```powershell
-python haftalik_veri_topla.py
-```
-Output: `haftalik_hava_kalitesi.csv`
+## 🚀 Key Features
 
-**Generate plots:**
-```powershell
-python grafik_analiz.py
-```
-Output: `grafikler/pm25_zaman.png`, `sicaklik_zaman.png`, `nem_pm25.png`
+### 1. Multi-Pollutant Analysis
+The model doesn't just rely on PM2.5. It integrates multiple pollutants to calculate a comprehensive risk score:
+* **PM2.5 & PM10:** Particulate Matter.
+* **NO2:** Nitrogen Dioxide (Traffic pollution).
+* **O3:** Ozone.
+* **Meteorology:** Wind speed, direction, humidity, and precipitation.
 
-**Train models:**
-```powershell
-python tahmin_modeli.py
-```
-Output: `models/linear_regression.joblib`, `models/random_forest.joblib`, `models/feature_importances.csv`, `rf_actual_vs_pred.png`
+### 2. Robust Data Pipeline (No More NaNs)
+Real-time API data often contains gaps. This system includes a self-healing pipeline:
+* **Linear Interpolation:** mathematically fills missing hourly data based on trends.
+* **Forward/Back Fill:** ensures no zero-values break the model predictions.
+* **Real-time Calibration:** Uses the "Last Known Value" logic for live dashboarding.
 
-## Troubleshooting
-- **Import error**: install missing package:
-  ```powershell
-  python -m pip install seaborn python-dotenv scikit-learn
-  ```
-- **API timeout**: check network/proxy connection.
-- **CSV not found**: run `haftalik_veri_topla.py` first to generate data.
+### 3. Advanced AI Model
+Built with `HistGradientBoostingRegressor` from Scikit-Learn, which is optimized for tabular time-series data. It learns:
+* **Seasonality:** Winter pollution spikes vs. Summer trends.
+* **Lag Features:** How yesterday's pollution affects today.
+* **Weekend Effect:** Changes in industrial/traffic emissions on weekends.
 
-## License
-Choose an appropriate license for this project.
+### 4. Professional Dashboard
+A modern, dark-mode compatible web interface built with **Streamlit**. It features color-coded risk cards, dynamic charts, and live data monitoring.
+
+---
+
+## 📂 Project Structure
+
+Here is the explanation of the files in this repository:
+
+```text
+AirQualityAI/
+├── app.py                  # The Main Dashboard application (Streamlit Frontend)
+├── genis_veri_topla.py     # ETL Script: Fetches & cleans 2 years of history from Open-Meteo
+├── genis_model_egit.py     # ML Pipeline: Trains the model & generates performance plots
+├── genis_hava_kalitesi.csv # The raw dataset (Generated by the ETL script)
+├── requirements.txt        # List of Python libraries required to run the project
+├── models/                 # Folder containing the trained .joblib model files
+│   └── aqi_model.joblib    # The serialized trained model
+├── grafikler/              # Performance reports generated after training
+│   ├── 1_gercek_vs_tahmin.png
+│   ├── 2_zaman_serisi_tahmin.png
+│   └── 3_etkileyen_faktorler.png
+└── README.md               # Project documentation
+
+
+🛠️ Installation & Usage
+Follow these steps to run the project on your local machine.
+
+1. Clone or Download
+Clone this repository or download the files to a folder.
+
+2. Install Requirements
+Open your terminal in the project folder and run:
+
+Bash
+
+pip install -r requirements.txt
+(Dependencies: streamlit, pandas, numpy, scikit-learn, joblib, requests, matplotlib, seaborn)
+
+3. Data Collection (ETL)
+Fetch the historical data (PM2.5, PM10, NO2, Weather) from Open-Meteo:
+
+Bash
+
+python genis_veri_topla.py
+Output: Creates genis_hava_kalitesi.csv.
+
+4. Model Training
+Train the Gradient Boosting model and generate report graphs:
+
+Bash
+
+python genis_model_egit.py
+Output: Saves the model to models/ and plots to grafikler/.
+
+5. Launch the Dashboard
+Start the web application:
+
+Bash
+
+streamlit run app.py
+📊 Methodology & Validation
+Satellite vs. Ground Stations
+You might notice differences between this model (Satellite-based) and local ground stations (e.g., Municipal stations):
+
+This Model (Background Level): Uses Open-Meteo satellite/model data, representing the average air quality over a 10x10km grid. It reflects the general city atmosphere.
+
+Ground Stations (Hotspots): Often located near heavy traffic. They measure local "hotspots" (e.g., high NO2 from exhaust), leading to higher readings than regional averages.
+
+Conclusion: Both are correct within their own spatial resolution.
+
+Performance Metrics
+The model is evaluated using a 90/10 Train-Test split.
+
+R² Score: Indicates how well the model captures the variance.
+
+Feature Importance: Analysis shows that Previous Day's AQI (Lag) and PM2.5 levels are the strongest predictors.
+
+👨‍💻 Author
+[Eren Duman]
+
+Department: Computer Engineering
+
+University: Inonu University
+
+Project Type: Senior Design Project (Bitirme Projesi)
