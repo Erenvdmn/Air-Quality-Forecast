@@ -59,6 +59,7 @@ AirQualityAI/
 │   └── 3_etkileyen_faktorler.png
 └── README.md               # Project documentation
 
+```
 
 🛠️ Installation & Usage
 Follow these steps to run the project on your local machine.
@@ -114,7 +115,7 @@ R² Score: Indicates how well the model captures the variance.
 Feature Importance: Analysis shows that Previous Day's AQI (Lag) and PM2.5 levels are the strongest predictors.
 
 👨‍💻 Author
-[Eren Duman]
+Eren Duman
 
 Department: Computer Engineering
 
